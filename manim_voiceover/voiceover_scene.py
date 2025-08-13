@@ -5,6 +5,8 @@ from typing import Optional, Generator
 import re
 import typing as t
 
+from dataclasses import dataclass
+
 from manimlib.scene.scene import Scene
 from manimlib.config import manim_config as config
 from manim_voiceover.services.base import SpeechService
@@ -22,6 +24,7 @@ class VoiceoverScene(Scene):
     current_tracker: Optional[VoiceoverTracker]
     create_subcaption: bool
     create_script: bool
+    subcaptions: list
 
     def set_speech_service(
         self,
@@ -38,10 +41,17 @@ class VoiceoverScene(Scene):
         """
         self.speech_service = speech_service
         self.current_tracker = None
+        self.subcaptions = []
         if config["file_writer"]["save_last_frame"]:
             self.create_subcaption = False
         else:
             self.create_subcaption = create_subcaption
+
+    @dataclass
+    class _Subtitle:
+        content: str
+        start: float
+        end: float
 
     def add_voiceover_text(
         self,
@@ -131,6 +141,36 @@ class VoiceoverScene(Scene):
                 offset=current_offset,
             )
             current_offset += chunk_duration
+
+    def add_subcaption(
+        self, content: str, duration: float = 1, offset: float = 0
+    ) -> None:
+        """Store a subcaption to be written at teardown."""
+        start = self.time + offset
+        end = start + duration
+        self.subcaptions.append(self._Subtitle(content, start, end))
+
+    @staticmethod
+    def _format_srt_timestamp(seconds: float) -> str:
+        ms = int(seconds * 1000)
+        s, ms = divmod(ms, 1000)
+        m, s = divmod(s, 60)
+        h, m = divmod(m, 60)
+        return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
+
+    def tear_down(self) -> None:
+        if self.create_subcaption and self.subcaptions:
+            lines = []
+            for i, sc in enumerate(self.subcaptions, start=1):
+                start = self._format_srt_timestamp(sc.start)
+                end = self._format_srt_timestamp(sc.end)
+                lines.append(f"{i}\n{start} --> {end}\n{sc.content}\n")
+            srt_path = (
+                self.file_writer.get_output_file_rootname().with_suffix(".srt")
+            )
+            with open(srt_path, "w", encoding="utf-8") as f:
+                f.write("\n".join(lines))
+        super().tear_down()
 
     def add_voiceover_ssml(self, ssml: str, **kwargs) -> None:
         raise NotImplementedError("SSML input not implemented yet.")
