@@ -47,10 +47,8 @@ class VoiceoverTracker:
         self.data = data
         self.cache_dir = cache_dir
         self.duration = get_duration(Path(cache_dir) / self.data["final_audio"])
-        # last_t = scene.last_t
-        last_t = scene.renderer.time
-        if last_t is None:
-            last_t = 0
+        # Use the scene's internal time to anchor the audio timestamps
+        last_t = scene.time or 0
         self.start_t = last_t
         self.end_t = last_t + self.duration
 
@@ -130,7 +128,7 @@ class VoiceoverTracker:
             int: The remaining duration of the voiceover in seconds.
         """
         # result= max(self.end_t - self.scene.last_t, 0)
-        result = max(self.end_t - self.scene.renderer.time + buff, 0)
+        result = max(self.end_t - self.scene.time + buff, 0)
         # print(result)
         return result
 
@@ -161,7 +159,7 @@ class VoiceoverTracker:
         self._check_bookmarks()
         if not mark in self.bookmark_times:
             raise Exception("There is no <bookmark mark='%s' />" % mark)
-        result = max(self.bookmark_times[mark] - self.scene.renderer.time + buff, 0)
+        result = max(self.bookmark_times[mark] - self.scene.time + buff, 0)
         if limit is not None:
             result = min(limit, result)
         return result
