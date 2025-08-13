@@ -1,12 +1,12 @@
 from pathlib import Path
 import re
 import numpy as np
-from manim import logger
+from manimlib import logger
 
 from typing import Optional, List
 from scipy.interpolate import interp1d
 
-from manim import Scene
+from manimlib.scene.scene import Scene
 from manim_voiceover.modify_audio import get_duration
 from manim_voiceover.helper import remove_bookmarks
 

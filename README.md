@@ -9,7 +9,7 @@
     <a href="https://manim.community/discord"><img src="https://dcbadge.vercel.app/api/server/qY23bthHTY?style=flat" alt="Discord"></a>
 </p>
 
-Manim Voiceover is a [Manim](https://manim.community) plugin for all things voiceover:
+Manim Voiceover is an extension for [ManimGL](https://github.com/3b1b/manim) for all things voiceover:
 
 - Add voiceovers to Manim videos *directly in Python* without having to use a video editor.
 - Record voiceovers with your microphone during rendering with a simple command line interface.

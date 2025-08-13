@@ -5,7 +5,8 @@ from typing import Optional, Generator
 import re
 import typing as t
 
-from manim import Scene, config
+from manimlib.scene.scene import Scene
+from manimlib.config import manim_config as config
 from manim_voiceover.services.base import SpeechService
 from manim_voiceover.tracker import VoiceoverTracker
 from manim_voiceover.helper import chunks, remove_bookmarks
@@ -37,7 +38,7 @@ class VoiceoverScene(Scene):
         """
         self.speech_service = speech_service
         self.current_tracker = None
-        if config.save_last_frame:
+        if config["file_writer"]["save_last_frame"]:
             self.create_subcaption = False
         else:
             self.create_subcaption = create_subcaption
@@ -155,7 +156,7 @@ class VoiceoverScene(Scene):
         Args:
             duration (float): The duration to wait for in seconds.
         """
-        if duration > 1 / config["frame_rate"]:
+        if duration > 1 / config["camera"]["fps"]:
             self.wait(duration)
 
     def wait_until_bookmark(self, mark: str) -> None:
