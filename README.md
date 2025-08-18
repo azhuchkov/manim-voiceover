@@ -7,5 +7,5 @@ This repository is a port of the original [Manim Voiceover](https://github.com/M
 Install directly from GitHub:
 
 ```bash
-pip install git+https://github.com/manim-voiceover/manim-voiceover.git
+pip install git+https://github.com/azhuchkov/manim-voiceover.git
 ```
